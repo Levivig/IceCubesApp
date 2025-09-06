@@ -4,13 +4,13 @@ import DesignSystem
 import EmojiText
 import Env
 import Models
-import Network
+import NetworkClient
 import Observation
 import SwiftUI
 
 @MainActor
 @Observable public class AccountsListRowViewModel {
-  var client: Client?
+  var client: MastodonClient?
 
   var account: Account
   var relationShip: Relationship?
@@ -26,7 +26,7 @@ public struct AccountsListRow: View {
   @Environment(Theme.self) private var theme
   @Environment(CurrentAccount.self) private var currentAccount
   @Environment(RouterPath.self) private var routerPath
-  @Environment(Client.self) private var client
+  @Environment(MastodonClient.self) private var client
   @Environment(QuickLook.self) private var quickLook
   @Environment(StreamWatcher.self) private var watcher
   @Environment(AppAccountsManager.self) private var appAccount
@@ -134,12 +134,20 @@ public struct AccountsListRow: View {
       AccountDetailContextMenu(
         showBlockConfirmation: $showBlockConfirmation,
         showTranslateView: $showTranslateView,
-        viewModel: .init(account: viewModel.account))
+        account: viewModel.account,
+        relationship: .constant(viewModel.relationShip),
+        isCurrentUser: false)
     } preview: {
       List {
         AccountDetailHeaderView(
-          viewModel: .init(account: viewModel.account),
           account: viewModel.account,
+          relationship: viewModel.relationShip,
+          fields: [],
+          followButtonViewModel: .constant(nil),
+          translation: .constant(nil),
+          isLoadingTranslation: .constant(false),
+          isCurrentUser: false,
+          accountId: viewModel.account.id,
           scrollViewProxy: nil
         )
         .applyAccountDetailsRowStyle(theme: theme)
